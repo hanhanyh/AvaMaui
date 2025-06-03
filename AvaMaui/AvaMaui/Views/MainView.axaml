@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AvaMaui.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaMaui.Views.MainView"
+             x:DataType="vm:MainViewModel">
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:MainViewModel />
+	</Design.DataContext>
+	<Grid
+		RowDefinitions="Auto,Auto,Auto,Auto"
+		ColumnDefinitions="Auto,Auto,Auto"
+		>
+		<TextBlock Grid.Row="0"
+				   Grid.ColumnSpan="4"
+				  Name="txt_block"
+				   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		<Button Grid.Row="1" Grid.Column="0" Name="btn_gps" >获取定位</Button>
+		<Button Grid.Row="1" Grid.Column="1" Name="btn_battery" >获取电池信息</Button>
+		<Button Grid.Row="1" Grid.Column="2"
+				Margin="0,0,0,0"
+				Name="btn_cappic" >拍照</Button>
+
+		<Button Grid.Row="2" Grid.Column="0" Name="btn_pickpic" >选择照片</Button>
+
+		<Button Grid.Row="3" Grid.Column="0"
+				Margin="0,20,0,0"
+				Name="btn_fly"
+				Content="☰">
+			<Button.Flyout>
+				<Flyout Placement="BottomEdgeAlignedLeft"  >
+					<StackPanel Width="200" Background="Transparent" Orientation="Vertical">
+						<Button Content="Menu Item 1" Margin="10"/>
+						<Button Content="Menu Item 2" Margin="10"/>
+						<Button Content="Menu Item 3" Margin="10"/>
+						<Button Content="Menu Item 4" Margin="10"/>
+						<Button Content="Menu Item 5" Margin="10"/>
+						<Button Content="Menu Item 6" Margin="10"/>
+					</StackPanel>
+				</Flyout>
+			</Button.Flyout>
+		</Button>
+
+
+	</Grid>
+
+</UserControl>
