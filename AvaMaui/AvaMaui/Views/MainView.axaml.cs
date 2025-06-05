@@ -43,8 +43,8 @@ namespace AvaMaui.Views
             if (files.Count() > 0)
             {
                 StringBuilder sb = new StringBuilder();
-                string filepath = files[0].TryGetLocalPath();
-                using FileStream fs = new FileStream(filepath, FileMode.Open);
+                // string filepath = files[0].TryGetLocalPath();
+                using Stream fs = await files[0].OpenReadAsync();//非专属目录下：最好是直接通过 流，而不是TryGetLocalPath
                 using (var reader = new StreamReader(fs, Encoding.UTF8))
                 {
                     char[] buffer = new char[1024];
