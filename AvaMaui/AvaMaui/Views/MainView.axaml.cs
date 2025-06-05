@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.Maui.Devices;
 using Microsoft.Maui.Devices.Sensors;
@@ -59,7 +60,9 @@ namespace AvaMaui.Views
 
                     // save the file into local storage
                     //FileSystem.CacheDirectory
-                    string localFilePath = Path.Combine(FileSystem.AppDataDirectory, photo.FileName);
+                    var storageprovider = TopLevel.GetTopLevel(this)?.StorageProvider;
+                    IStorageFolder folder = await storageprovider.TryGetWellKnownFolderAsync(Avalonia.Platform.Storage.WellKnownFolder.Downloads);
+                    string localFilePath = Path.Combine(folder.TryGetLocalPath(), photo.FileName);
                     txt_block.Text = localFilePath;
                     using Stream sourceStream = await photo.OpenReadAsync();
                     using FileStream localFileStream = File.OpenWrite(localFilePath);
