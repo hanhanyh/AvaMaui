@@ -9,6 +9,9 @@ using Microsoft.Maui.Media;
 using Microsoft.Maui.Storage;
 using System;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AvaMaui.Views
@@ -23,6 +26,84 @@ namespace AvaMaui.Views
             btn_cappic.Click += Btn_cappic_Click;
             btn_pickpic.Click += Btn_pickpic_Click;
             // btn_fly.Click += Btn_fly_Click;
+            btn_writefile.Click += Btn_writefile_Click;
+            btn_readfile.Click += Btn_readfile_Click;
+            btn_pickfileread.Click += Btn_pickfileread_Click;
+        }
+
+        private async void Btn_pickfileread_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            IStorageProvider isp = TopLevel.GetTopLevel(this).StorageProvider;
+            var files = await isp.OpenFilePickerAsync(new FilePickerOpenOptions()
+            {
+                AllowMultiple = false,
+                Title = "选择文件",
+                FileTypeFilter = new[] { new Avalonia.Platform.Storage.FilePickerFileType("文件") { Patterns = new[] { "*" } } }
+            });
+            if (files.Count() > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                string filepath = files[0].TryGetLocalPath();
+                using FileStream fs = new FileStream(filepath, FileMode.Open);
+                using (var reader = new StreamReader(fs, Encoding.UTF8))
+                {
+                    char[] buffer = new char[1024];
+                    int bytesRead;
+
+                    while ((bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        sb.Append(buffer, 0, bytesRead);
+                    }
+                }
+                FileContent.Text = sb.ToString();
+            }
+        }
+
+        private async void Btn_readfile_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            IStorageProvider isp = TopLevel.GetTopLevel(this).StorageProvider;
+            IStorageFolder isf = await isp.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+            string localpath = isf.TryGetLocalPath();
+            string filepath = Path.Combine(localpath, "data.txt");
+            StringBuilder sb = new StringBuilder();
+            int bufferSize = 1024;
+            if (File.Exists(filepath))
+            {
+                using FileStream fs = new FileStream(filepath, FileMode.Open);
+                using (var reader = new StreamReader(fs, Encoding.UTF8))
+                {
+                    char[] buffer = new char[bufferSize];
+                    int bytesRead;
+
+                    while ((bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        sb.Append(buffer, 0, bytesRead);
+                    }
+                }
+                FileContent.Text = sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// 写入文件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private async void Btn_writefile_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            IStorageProvider isp = TopLevel.GetTopLevel(this).StorageProvider;
+            IStorageFolder isf = await isp.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+            string localpath = isf.TryGetLocalPath();
+            string filepath = Path.Combine(localpath, "data.txt");
+            if (File.Exists(filepath))
+            {
+                File.Delete(filepath);
+            }
+            using FileStream fs = new FileStream(filepath, FileMode.Create);
+            byte[] buffer = Encoding.UTF8.GetBytes(FileContent.Text);
+            await fs.WriteAsync(buffer, 0, buffer.Count());
+            await fs.FlushAsync();
         }
 
         private void Btn_fly_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
